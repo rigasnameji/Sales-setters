@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     })
 
     const { object } = await generateObject({
-      model: google('gemini-1.5-pro-latest'),
+      model: google('gemini-2.5-flash'),
       schema: z.object({
         variations: z.array(z.string()).length(3).describe('Exactly 3 distinct response variations'),
       }),
