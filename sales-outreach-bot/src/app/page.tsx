@@ -34,7 +34,7 @@ export default function Home() {
       setVariations(data)
     } catch (error) {
       console.error(error)
-      alert('Failed to generate responses. Please check your OpenAI API key in the .env file and try again.')
+      alert('Failed to generate responses. Please check your Google Gemini API key in the Admin settings and try again.')
     } finally {
       setIsLoading(false)
     }

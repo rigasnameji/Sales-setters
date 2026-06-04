@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
@@ -17,8 +17,12 @@ export async function POST(req: Request) {
       settings = await prisma.botSettings.create({ data: {} })
     }
 
+    const google = createGoogleGenerativeAI({
+      apiKey: settings.apiKey || process.env.GEMINI_API_KEY || '',
+    })
+
     const { object } = await generateObject({
-      model: openai('gpt-4o'),
+      model: google('gemini-1.5-pro-latest'),
       schema: z.object({
         variations: z.array(z.string()).length(3).describe('Exactly 3 distinct response variations'),
       }),

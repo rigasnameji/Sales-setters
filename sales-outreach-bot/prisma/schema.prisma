@@ -12,5 +12,6 @@ model BotSettings {
   id           String   @id @default(cuid())
   systemPrompt String   @default("You are an expert sales outreach assistant. Your goal is to write 3 distinct, highly effective response variations for a sales conversation based on the context provided. Return your response in JSON format.")
   guidelines   String   @default("1. Be concise.\n2. Always end with a question.\n3. Keep it professional but friendly.")
+  apiKey       String?
   updatedAt    DateTime @updatedAt
 }

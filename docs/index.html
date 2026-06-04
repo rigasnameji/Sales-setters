@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Pipeline CRM Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar / Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">⚡</span>
+          <h2>Antigravity</h2>
+        </div>
+        <p class="tagline">Data Enrichment Control Center</p>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" id="btn-crm-dashboard" data-filter="crm">
+          <span class="nav-icon">📈</span> CRM Dashboard
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-title">
+          <h1 id="pipeline-title">CRM Dashboard</h1>
+          <p class="subtitle" id="pipeline-desc">Visual overview of your outbound sales pipeline and lead hygiene.</p>
+        </div>
+      </header>
+
+      <!-- CRM Dashboard View -->
+      <section class="crm-board" id="crm-dashboard-view" style="display: flex;">
+        <!-- Config Bar -->
+        <div class="dashboard-card" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 16px;">
+          <div style="flex-grow: 1; margin-right: 16px;">
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Google Sheet Data Source</label>
+            <input type="text" id="crm-sheet-url" class="form-control" style="margin-top: 6px;" placeholder="Paste your Google Sheet share link here (e.g. https://docs.google.com/spreadsheets/d/.../edit)" />
+          </div>
+          <button id="btn-save-crm-config" class="btn btn-primary" style="margin-top: 20px;">Save & Sync</button>
+        </div>
+
+        <!-- Top row: KPI cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Total Leads</div><div class="kpi-value" id="kpi-total">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">New Leads</div><div class="kpi-value" id="kpi-new">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Due Today</div><div class="kpi-value text-alert" id="kpi-due-today">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Overdue Follow-ups</div><div class="kpi-value text-danger" id="kpi-overdue">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Upcoming (3 days)</div><div class="kpi-value text-warning" id="kpi-upcoming">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg Attempts</div><div class="kpi-value" id="kpi-avg-attempts">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Missing Notes</div><div class="kpi-value text-danger" id="kpi-missing-notes">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">No Follow-up Date</div><div class="kpi-value text-danger" id="kpi-no-followup">0</div></div>
+        </div>
+
+        <!-- Middle row: Pipeline by status & Follow-up actions -->
+        <div class="dashboard-grid-2">
+          <div class="dashboard-card">
+            <h3>Pipeline by Outreach Status</h3>
+            <div class="chart-container"><canvas id="chart-pipeline-status"></canvas></div>
+          </div>
+          <div class="dashboard-card" style="overflow-y: auto; max-height: 400px;">
+            <h3>Follow-Up Action Board</h3>
+            <table class="crm-table" id="table-followups">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Lead / Contact</th>
+                  <th>Owner</th>
+                  <th>Due</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Lower row: Lead aging, Attempts, Workload -->
+        <div class="dashboard-grid-3">
+          <div class="dashboard-card">
+            <h3>Lead Aging (Since 1st Contact)</h3>
+            <div class="chart-container"><canvas id="chart-aging"></canvas></div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Attempts Distribution</h3>
+            <div class="chart-container"><canvas id="chart-attempts"></canvas></div>
+          </div>
+          <div class="dashboard-card" style="overflow-y: auto; max-height: 300px;">
+            <h3>Sales Person Workload</h3>
+            <table class="crm-table" id="table-workload">
+              <thead>
+                <tr>
+                  <th>Rep</th>
+                  <th>Total</th>
+                  <th>Overdue</th>
+                  <th>Due Today</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bottom row: CRM Hygiene & Activity Trend -->
+        <div class="dashboard-grid-2">
+          <div class="dashboard-card">
+            <h3>CRM Hygiene Control</h3>
+            <div class="hygiene-stats" id="hygiene-stats">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Daily Activity Trend</h3>
+            <div class="chart-container"><canvas id="chart-activity"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Sales Rep Performance Container -->
+        <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+          <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Sales Rep Activity (Last 30 Days)</h3>
+          <div id="sales-rep-charts-container" class="dashboard-grid-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -18,12 +18,14 @@ export async function updateSettings(formData: FormData) {
   
   const systemPrompt = formData.get('systemPrompt') as string
   const guidelines = formData.get('guidelines') as string
+  const apiKey = formData.get('apiKey') as string
 
   await prisma.botSettings.update({
     where: { id: settings.id },
     data: {
       systemPrompt: systemPrompt || "",
       guidelines: guidelines || "",
+      apiKey: apiKey || null,
     }
   })
   

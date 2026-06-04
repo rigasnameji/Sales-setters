@@ -28,6 +28,19 @@ export default async function AdminPage() {
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-3">
+              <Label htmlFor="apiKey" className="text-base font-semibold">Google Gemini API Key (Optional)</Label>
+              <input 
+                id="apiKey"
+                name="apiKey"
+                type="password"
+                placeholder="AIzaSy..."
+                defaultValue={settings.apiKey || ""}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <p className="text-sm text-muted-foreground">Get a free key from <a href="https://aistudio.google.com/app/apikey" target="_blank" className="text-blue-500 underline">Google AI Studio</a>. If provided, this key will be used instead of the local server environment variable.</p>
+            </div>
+
+            <div className="space-y-3">
               <Label htmlFor="systemPrompt" className="text-base font-semibold">System Prompt</Label>
               <Textarea 
                 id="systemPrompt"
